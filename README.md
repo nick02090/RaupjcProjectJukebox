@@ -32,5 +32,4 @@ dodati nove.
 link: https://raupjcprojectjukebox.azurewebsites.net
 
 admin - nickname: admin123
-
       - password: Admin123$%&
