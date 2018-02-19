@@ -30,5 +30,7 @@ pjesama player staje te se potrebno preusmjeriti nazad u Jukebox (ukoliko korisn
 dodati nove.
 
 link: https://raupjcprojectjukebox.azurewebsites.net
+
 admin - nickname: admin123
+
       - password: Admin123$%&
