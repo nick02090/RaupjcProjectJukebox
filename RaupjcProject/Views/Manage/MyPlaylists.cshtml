@@ -1,0 +1,136 @@
+﻿@model MyPlaylistsViewModel
+@{
+    ViewData["Title"] = "My Playlists";
+    ViewData.AddActivePage(ManageNavPages.MyPlaylists);
+}
+
+<h4>@ViewData["Title"]</h4>
+@Html.Partial("_StatusMessage", Model.StatusMessage)
+
+@if (Model.User.Nickname.Equals("admin123"))
+{
+    <div class="alert-warning">
+        <strong><span class="glyphicon glyphicon-warning-sign"></span></strong> You're signed in as admin - you have access to all of the playlists. Yet you can't create them.<br />
+    </div>
+
+    @if (Model.Playlists.Count > 0)
+    {
+        <p>Number of playlists: @Model.Playlists.Count</p><br />
+        <div class="container">
+            @{var num = Model.Playlists.Count;}
+            @for (var x = 0; x < num; x += 2)
+            {
+
+                <div class="row">
+                    @for (var i = x; i < x + 2; i += 1)
+                    {
+                        @if (i < num)
+                        {
+                            <div class="col-md-4 col-sm-4 hidden-xs">
+                                <div class="widget">
+                                    <div class="panel panel-default" style="width:285px; align-content:space-between;">
+                                        <div class="panel-heading">
+                                            <span class="glyphicon glyphicon-book"></span> <strong>Name: </strong>@Model.Playlists[i].Name<br />
+                                            <span class="glyphicon glyphicon-fire"></span> <strong>Moods: </strong>@foreach (var mood in Model.Playlists[i].Moods)
+                                            {
+                                                @(mood.Value + " ");
+                                            }
+                                            <br /><span class="glyphicon glyphicon-cd"></span> <strong>Tracks: </strong>@Model.Playlists[i].Songs.Count
+                                        </div>
+                                        <div class="panel-body">
+                                            @if (Model.Playlists[i].Image == null)
+                                            {
+                                                <p>No image found.</p>
+                                            }
+                                            else
+                                            {
+                                                <img src="data:image;base64,@Convert.ToBase64String(Model.Playlists[i].Image)" width="250" height="300" />
+                                            }
+                                        </div>
+                                        <div class="panel-footer">
+                                            @Html.ActionLink("Delete", "DeletePlaylist", "Jukebox", new { Model.Playlists[i].Id })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                </div>
+
+            }
+        </div>
+    }
+    else
+    {
+        <p>There are no playlists.</p><br />
+    }
+}
+else
+{
+
+    <p>
+        <a asp-area="" asp-controller="Jukebox" asp-action="AddPlaylistName">Create new playlist?</a>
+    </p><br />
+
+    @if (Model.MyPlaylists.Count > 0)
+    {
+        <p>Number of your playlists: @Model.MyPlaylists.Count</p>
+        <div class="container">
+            @{var num = Model.MyPlaylists.Count;}
+            @for (var x = 0; x < num; x += 2)
+            {
+
+                <div class="row">
+                    @for (var i = x; i < x + 2; i += 1)
+                    {
+                        @if (i < num)
+                        {
+                            <div class="col-md-4 col-sm-4 hidden-xs">
+                                <div class="widget">
+                                    <div class="panel panel-default" style="width:285px; align-content:space-between;">
+                                        <div class="panel-heading">
+                                            <span class="glyphicon glyphicon-book"></span> <strong>Name: </strong>@Model.MyPlaylists[i].Name<br />
+                                            <span class="glyphicon glyphicon-fire"></span> <strong>Moods: </strong>@foreach (var mood in Model.MyPlaylists[i].Moods)
+                                            {
+                                                @(mood.Value + " ");
+                                            }
+                                            <br /><span class="glyphicon glyphicon-cd"></span> <strong>Tracks: </strong>@Model.MyPlaylists[i].Songs.Count
+                                        </div>
+                                        <div class="panel-body">
+                                            @if (Model.MyPlaylists[i].Image == null)
+                                            {
+                                                <p>No image found.</p>
+                                            }
+                                            else
+                                            {
+                                                <img src="data:image;base64,@Convert.ToBase64String(Model.MyPlaylists[i].Image)" width="250" height="300" />
+                                            }
+                                        </div>
+                                        <div class="panel-footer">
+                                            @Html.ActionLink("Delete", "DeletePlaylist", "Jukebox", new { Model.MyPlaylists[i].Id })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                </div>
+
+            }
+        </div>
+    }
+    else
+    {
+        <p>You don't have any playlists.</p><br />
+    }
+
+
+
+}
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

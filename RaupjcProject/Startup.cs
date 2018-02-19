@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RaupjcProject.Data;
 using RaupjcProject.Models;
 using RaupjcProject.Services;
+using RaupjcProject.Jukebox;
 
 namespace RaupjcProject
 {
@@ -37,6 +38,12 @@ namespace RaupjcProject
             services.AddTransient<IEmailSender, EmailSender>();
 
             services.AddMvc();
+
+            services.AddTransient<IJukeboxRepository, JukeboxRepository>();
+            services.AddScoped<MyEf6Context>(x =>
+            {
+                return new MyEf6Context(Configuration.GetConnectionString("DefaultConnection"));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,7 +68,7 @@ namespace RaupjcProject
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Jukebox}/{action=Index}/{id?}");
             });
         }
     }

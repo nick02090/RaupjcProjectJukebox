@@ -1,0 +1,43 @@
+﻿@model RaupjcProject.Models.JukeboxViewModels.AddPlaylistNameViewModel
+@{
+    ViewData["Title"] = "New playlist";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div>
+    <h4>Manage playlist settings</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+                <div>
+                    <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" enctype="multipart/form-data">
+                        <div class="input-group">
+                            <span class="input-group-addon">Picture <i class="glyphicon glyphicon-picture"></i></span>
+                            <input asp-for="PictureFile" type="file" class="glyphicon glyphicon-search" />
+                            <span asp-validation-for="PictureFile" class="text-danger"></span>
+                        </div><br />
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-book"></i></span>
+                            <input asp-for="Name" type="text" class="form-control" placeholder="Playlist name (e.g. My Christmas Mix)" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div><br/>
+                        <button type="submit" class="btn btn-primary">Add playlist</button><br />
+                    </form>
+            </div>
+
+            @if(Model.Try == true)
+            {
+                @if (Model.IsPicture == false)
+                {
+                    <br /><div class="alert alert-danger">
+                         <strong>Error!</strong> Picture must be type of .jpg, .jpeg or .png!
+                     </div>
+                }
+            }
+        </div>
+        <div class="col-md-6">
+
+        </div>
+    </div>
+</div>

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using RaupjcProject.Jukebox;
 using RaupjcProject.Models;
 using RaupjcProject.Models.ManageViewModels;
 using RaupjcProject.Services;
@@ -25,11 +26,13 @@ namespace RaupjcProject.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly UrlEncoder _urlEncoder;
+        private readonly IJukeboxRepository _jukeboxRepository;
 
         private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
         private const string RecoveryCodesKey = nameof(RecoveryCodesKey);
 
         public ManageController(
+            IJukeboxRepository jukeboxRepository,
           UserManager<ApplicationUser> userManager,
           SignInManager<ApplicationUser> signInManager,
           IEmailSender emailSender,
@@ -41,6 +44,7 @@ namespace RaupjcProject.Controllers
             _emailSender = emailSender;
             _logger = logger;
             _urlEncoder = urlEncoder;
+            _jukeboxRepository = jukeboxRepository;
         }
 
         [TempData]
@@ -106,7 +110,7 @@ namespace RaupjcProject.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost]
+        /*[HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SendVerificationEmail(IndexViewModel model)
         {
@@ -128,6 +132,28 @@ namespace RaupjcProject.Controllers
 
             StatusMessage = "Verification email sent. Please check your email.";
             return RedirectToAction(nameof(Index));
+        }*/
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> MyPlaylists()
+        {
+            var appUser = await _userManager.GetUserAsync(User);
+            var user = await _jukeboxRepository.GetUserAsync(appUser.Id);
+            var myPlaylists = await _jukeboxRepository.GetAllFilteredPlaylistsAsync(playlist => playlist.User.Id.Equals(user.Id));
+            var playlists = await _jukeboxRepository.GetAllPlaylistsAsync();
+            var model = new MyPlaylistsViewModel(StatusMessage, myPlaylists, playlists, user);
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Moods()
+        {
+            var appUser = await _userManager.GetUserAsync(User);
+            var user = await _jukeboxRepository.GetUserAsync(appUser.Id);
+            var moods = await _jukeboxRepository.GetAllMoodsAsync();
+            var model = new MoodsViewModel(StatusMessage, moods, user);
+            return View(model);
         }
 
         [HttpGet]
@@ -226,7 +252,7 @@ namespace RaupjcProject.Controllers
             return RedirectToAction(nameof(SetPassword));
         }
 
-        [HttpGet]
+        /*[HttpGet]
         public async Task<IActionResult> ExternalLogins()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -489,7 +515,7 @@ namespace RaupjcProject.Controllers
             var model = new ShowRecoveryCodesViewModel { RecoveryCodes = recoveryCodes.ToArray() };
 
             return View(nameof(ShowRecoveryCodes), model);
-        }
+        }*/
 
         #region Helpers
 
@@ -522,7 +548,7 @@ namespace RaupjcProject.Controllers
         {
             return string.Format(
                 AuthenticatorUriFormat,
-                _urlEncoder.Encode("RaupjcProject"),
+                _urlEncoder.Encode("raupjc_project"),
                 _urlEncoder.Encode(email),
                 unformattedKey);
         }

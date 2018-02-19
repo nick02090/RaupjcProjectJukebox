@@ -15,6 +15,10 @@ namespace RaupjcProject.Views.Manage
 
         public static string ChangePassword => "ChangePassword";
 
+        public static string MyPlaylists => "MyPlaylists";
+
+        public static string Moods => "Moods";
+
         public static string ExternalLogins => "ExternalLogins";
 
         public static string TwoFactorAuthentication => "TwoFactorAuthentication";
@@ -23,10 +27,14 @@ namespace RaupjcProject.Views.Manage
 
         public static string ChangePasswordNavClass(ViewContext viewContext) => PageNavClass(viewContext, ChangePassword);
 
+        public static string MyPlaylistsNavClass(ViewContext viewContext) => PageNavClass(viewContext, MyPlaylists);
+
+        public static string MoodsNavClass(ViewContext viewContext) => PageNavClass(viewContext, Moods);
+
         public static string ExternalLoginsNavClass(ViewContext viewContext) => PageNavClass(viewContext, ExternalLogins);
 
         public static string TwoFactorAuthenticationNavClass(ViewContext viewContext) => PageNavClass(viewContext, TwoFactorAuthentication);
-    
+
         public static string PageNavClass(ViewContext viewContext, string page)
         {
             var activePage = viewContext.ViewData["ActivePage"] as string;

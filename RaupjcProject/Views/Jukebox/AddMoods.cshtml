@@ -1,0 +1,58 @@
+﻿@model RaupjcProject.Models.JukeboxViewModels.AddMoodsViewModel
+@{
+    ViewData["Title"] = "New mood";
+}
+
+<!DOCTYPE html>
+
+<h2>@ViewData["Title"]</h2>
+
+<div>
+    <h4>Manage mood settings</h4>
+    <hr />
+    <p>
+        <a asp-area="" asp-controller="Jukebox" asp-action="ViewMoods">View all moods?</a><br />
+    </p><br/>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div>
+                <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-fire"></i></span>
+                        <input asp-for="Value" type="text" class="form-control" placeholder="Mood (e.g. happy)" />
+                        <span asp-validation-for="Value" class="text-danger"></span>
+                    </div><br />
+                    <button type="submit" class="btn btn-primary">Add mood</button><br />
+                </form>
+            </div>
+            @if (Model.Value != null)
+            {
+                @if (Model.MoreThanOne == false)
+                {
+                    @if (Model.Exists == true)
+                    {
+                        <br /><div class="alert alert-danger">
+                         <strong>Error!</strong> Mood (@Model.Value) already exists in database!
+                        </div>
+                    }
+                    else
+                    {
+                        <br /><div class="alert alert-success">
+                          <strong>Success!</strong> Mood (@Model.Value) added in database!
+                        </div>
+                    }
+                } else
+                {
+                    <br /><div class="alert alert-danger">
+                        <strong>Error!</strong> Mood (@Model.Value) must be only one word!
+                    </div>
+                }
+            }
+
+        </div>
+        <div class="col-md-6">
+
+        </div>
+    </div>
+</div>

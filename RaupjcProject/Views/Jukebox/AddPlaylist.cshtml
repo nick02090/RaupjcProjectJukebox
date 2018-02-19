@@ -1,0 +1,155 @@
+﻿@model RaupjcProject.Models.JukeboxViewModels.AddPlaylistViewModel
+@{
+    ViewData["Title"] = "Creating " + Model.Playlist.Name;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div>
+    <h4>Manage your playlist settings</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <p>
+                Current songs in playlist (@if (Model.Playlist.Songs != null)
+                {
+                    @Model.Playlist.Songs.Count
+                }
+                else
+                {
+                    @("N/A");
+                }):<br />
+            </p>
+            @if (Model.Playlist.Songs != null && Model.Playlist.Songs.Count > 0)
+            {
+                <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                    <div class="list-group">
+                        @{int numOfAdded = Model.Playlist.Songs.Count;
+                            if (numOfAdded > 20)
+                            {
+                                numOfAdded = 20;
+                            }}
+                        @for (var i = 0; i < numOfAdded; i++)
+                        {
+                            @if (Model.Playlist.Songs[@i] != null)
+                            {
+                                var song = Model.Playlist.Songs[@i];
+                                <a class="list-group-item">
+                                    @(i+1).
+                                    @song.Artist - @song.Title
+                                    @if (song.Album != null && song.Year != null)
+                                    {
+                                        <span class="badge">@song.Album (@song.Year)</span>
+                                    }
+                                    else if (song.Album != null && song.Year == null)
+                                    {
+                                        <span class="badge">@song.Album</span>
+                                    }
+                                    else if (song.Album == null && song.Year != null)
+                                    {
+                                        <span class="badge">(@song.Year)</span>
+                                    }
+                                </a>
+                            }
+
+                        }
+                    </div>
+                </form>
+            }
+        </div>
+        <div class="col-md-6">
+            <div class="alert-warning">
+                 <strong><span class="glyphicon glyphicon-warning-sign"></span>Warning!</strong>Once added song can not be removed!<br />
+            </div>
+            <p>
+                Available songs from database (@if (Model.AllSongs != null)
+                {
+                    @Model.AllSongs.Count
+                }
+                else
+                {
+                    @("0");
+                }):<br />
+            </p>
+            @if (Model.AllSongs != null && Model.AllSongs.Count > 0)
+            {
+                <p>Filter by:</p>
+                <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                    <div class="checkbox">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                        <input asp-for="Artist" type="text" class="form-control" placeholder="Artist (e.g. Linkin Park)" />
+                        <span asp-validation-for="Artist"></span>
+                    </div>
+                    <div class="checkbox">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-music"></i></span>
+                        <input asp-for="Title" type="text" class="form-control" placeholder="Title (e.g. In The End)" />
+                        <span asp-validation-for="Title"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form><br />
+
+                @if (Model.SearchedSongs != null)
+                {
+                    @if (Model.SearchedSongs.Count > 0)
+                    {
+                        <p>
+                            Showing only first 20 results (if you didn't get the wanted result, try to be more specific!)<br />
+                            <div class="alert-success">
+                                <strong>Success!</strong> Number of found songs by filter: {@Model.SearchedSongs.Count}<br />
+                            </div>
+                        </p>
+                        <div class="list-group">
+                            @{int numOfSearched = Model.SearchedSongs.Count;
+                                if (numOfSearched > 20)
+                                {
+                                    numOfSearched = 20;
+                                }}
+                            @for (var i = 0; i < numOfSearched; i++)
+                            {
+                                @if (Model.SearchedSongs[@i] != null)
+                                {
+                                    var song = Model.SearchedSongs[@i];
+                                    <a class="list-group-item">
+
+                                        @song.Artist - @song.Title
+                                        @if (song.Album != null && song.Year != null)
+                                        {
+                                            <span class="badge">@song.Album (@song.Year)</span>
+                                        }
+                                        else if (song.Album != null && song.Year == null)
+                                        {
+                                            <span class="badge">@song.Album</span>
+                                        }
+                                        else if (song.Album == null && song.Year != null)
+                                        {
+                                            <span class="badge">(@song.Year)</span>
+                                        }
+                                    </a>
+                                    @Html.ActionLink("Add to playlist", "AddSongToPlaylist", new { song.Id })
+                                }
+
+                            }
+                        </div>
+
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger">
+                            <strong>Error!</strong> There's no match for your filter entry, please try again!
+                        </div>
+                    }
+                }
+            }
+            <a asp-area="" asp-controller="Jukebox" asp-action="AddSong">Add a new song?</a>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-offset-11">
+            <form asp-area="" asp-controller="Jukebox" asp-action="AddPlaylistMoods">
+                <button type="submit" class="btn btn-warning">Next</button>
+            </form>
+        </div>
+    </div>
+</div>
+

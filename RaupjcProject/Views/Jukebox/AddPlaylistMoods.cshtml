@@ -1,0 +1,103 @@
+﻿@model RaupjcProject.Models.JukeboxViewModels.AddPlaylistMoodsViewModel
+@{
+    ViewData["Title"] = "Adding moods";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div>
+    <h4>Manage your playlist settings</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            @if (Model.Playlist.Moods != null)
+            {
+                @if (Model.Playlist.Moods.Count > 0)
+                {
+                    <p>@Model.Playlist.Name moods (@Model.Playlist.Moods.Count):</p><br />
+                    <div class="btn-group">
+                        @foreach (var mood in Model.Playlist.Moods)
+                        {
+                            <button type="button" class="btn btn-primary" disabled>@mood.Value</button>
+                        }
+                    </div>
+                }
+            }
+        </div>
+        <div class="col-md-6">
+            <div class="alert-warning">
+                 <strong><span class="glyphicon glyphicon-warning-sign"></span>Warning!</strong>Once added mood can not be removed!<br />
+            </div>
+            @if (Model.AllMoods != null)
+            {
+                @if (Model.AllMoods.Count > 0)
+                {
+                    <p>Top 20 moods:</p><br />
+                    <div class="btn-group">
+                        @foreach (var mood in Model.AllMoods.Take(20).ToList())
+                        {
+                            
+                        <p>
+                            <button type="button" class="btn btn-primary" disabled>@mood.Value</button>
+                            @Html.ActionLink("Add to playlist", "AddMoodToPlaylist", new { mood.Value })<br />
+                        </p>
+                            
+                        }
+                    </div>
+
+                }
+            }
+
+            <br />
+            <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                <div class="form-group">
+                    <label>Search for mood</label>
+                    <div class="input-group">
+                        <input asp-for="Search" class="form-control" style="width:200px">
+                        <span asp-validation-for="Search" class="text-danger"></span>
+                        <label></label>
+                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span> Search</button>
+                    </div>
+                </div>
+            </form>
+
+            @if (Model.SearchedMoods != null)
+            {
+                @if (Model.SearchedMoods.Count > 0)
+                {
+                    <p>
+                        Showing only first 20 results (if you didn't get the wanted result, try to be more specific!)<br />
+                        <div class="alert-success">
+                            <strong>Success!</strong> Number of found moods by filter: {@Model.SearchedMoods.Count}<br />
+                        </div>
+                    </p>
+                    <div class="btn-group">
+                        @foreach (var mood in Model.SearchedMoods.Take(20).ToList())
+                        {
+                            <button type="button" class="btn btn-primary" disabled>@mood.Value</button>
+                            @Html.ActionLink("Add to playlist", "AddMoodToPlaylist", new { mood.Value })
+                        }
+                    </div>
+                }
+                else
+                {
+                    @if (Model.Search != null)
+                    {
+                        <div class="alert alert-danger">
+                            <strong>Error!</strong> There's no match for your mood entry (@Model.Search), please try again!
+                        </div>
+                    }
+                }
+            }
+
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-offset-11">
+            <form asp-area="" asp-controller="Jukebox" asp-action="CreatePlaylist">
+                <button type="submit" class="btn btn-warning">Create</button>
+            </form>
+        </div>
+    </div>
+</div>

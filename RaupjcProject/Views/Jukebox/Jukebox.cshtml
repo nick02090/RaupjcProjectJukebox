@@ -1,0 +1,109 @@
+﻿@model RaupjcProject.Models.JukeboxViewModels.JukeboxViewModel
+
+@{
+    ViewData["Title"] = "Jukebox";
+}
+<style>
+    .center-block {
+        display: table;
+        margin-left: auto;
+        margin-right: auto;
+    }
+</style>
+
+@if (Model.AllPlaylists != null)
+{
+    @if (Model.AllPlaylists.Count > 0)
+    {
+        <div class="center-block">
+            <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                <div class="form-group">
+                    <label>Search for moods in playlists (seperate with space)</label>
+                    <div class="input-group">
+                        <input asp-for="Search" class="form-control" style="width:200px" placeholder="Mood (e.g. happy)">
+                        <span asp-validation-for="Search" class="text-danger"></span>
+                        <label></label>
+                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span> Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        @if (Model.Search != null)
+        {
+            if (Model.FilteredPlaylists != null)
+            {
+                if (Model.FilteredPlaylists.Count > 0)
+                {
+                    <div class="container">
+                        @{var num = Model.FilteredPlaylists.Count;}
+                        @for (var x = 0; x < num; x += 3)
+                        {
+
+                            <div class="row">
+                                @for (var i = x; i < x + 3; i += 1)
+                                {
+                                    @if (i < num)
+                                    {
+                                        <div class="col-md-4 col-sm-4 hidden-xs">
+                                            <div class="widget">
+                                                <div class="panel panel-default" style="width:285px; align-content:space-between;">
+                                                    <div class="panel-heading">
+                                                        <span class="glyphicon glyphicon-book"></span> <strong>Name: </strong>@Model.FilteredPlaylists[i].Name<br />
+                                                        <span class="glyphicon glyphicon-fire"></span> <strong>Moods: </strong>@foreach (var mood in Model.FilteredPlaylists[i].Moods)
+                                                        {
+                                                            @(mood.Value + " ");
+                                                        }
+                                                        <br /><span class="glyphicon glyphicon-cd"></span> <strong>Tracks: </strong>@Model.FilteredPlaylists[i].Songs.Count
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        @if (Model.FilteredPlaylists[i].Image == null)
+                                                        {
+                                                            <p>No image found.</p>
+                                                        }
+                                                        else
+                                                        {
+                                                            <img src="data:image;base64,@Convert.ToBase64String(Model.FilteredPlaylists[i].Image)" width="250" height="300" />
+                                                        }
+                                                    </div>
+                                                    <div class="panel-footer">
+                                                        @Html.ActionLink("Listen", "ListenToPlaylist", "Jukebox", new { Model.FilteredPlaylists[i].Id, Model.Search })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+
+                            </div>
+
+                        }
+                    </div>
+
+                }
+                else
+                {
+                    <div class="alert-warning">
+                        <strong><span class="glyphicon glyphicon-warning-sign"></span></strong> No playlists fulfilled your search (@Model.Search).<br />
+                    </div>
+                }
+
+            }
+            else
+            {
+                <div class="alert-warning">
+                    <strong><span class="glyphicon glyphicon-warning-sign"></span></strong> No playlists fulfilled your search (@Model.Search).<br />
+                </div>
+            }
+            
+
+        }
+    }
+    else
+    {
+        <div class="alert-danger">
+            <strong><span class="glyphicon glyphicon-exclamation-sign"></span></strong> There are currently no playlists in database.<br />
+        </div>
+    }
+}
+

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using RaupjcProject.Jukebox;
 using RaupjcProject.Models;
 using RaupjcProject.Models.AccountViewModels;
 using RaupjcProject.Services;
@@ -24,17 +25,20 @@ namespace RaupjcProject.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
+        private readonly IJukeboxRepository _jukeboxRepository;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
-            ILogger<AccountController> logger)
+            ILogger<AccountController> logger,
+            IJukeboxRepository jukeboxRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _logger = logger;
+            _jukeboxRepository = jukeboxRepository;
         }
 
         [TempData]
@@ -61,13 +65,13 @@ namespace RaupjcProject.Controllers
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(model.Nick, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-                    return RedirectToLocal(returnUrl);
+                    return RedirectToAction("Jukebox", "Jukebox", new { area = "" });
                 }
-                if (result.RequiresTwoFactor)
+                /*if (result.RequiresTwoFactor)
                 {
                     return RedirectToAction(nameof(LoginWith2fa), new { returnUrl, model.RememberMe });
                 }
@@ -75,7 +79,7 @@ namespace RaupjcProject.Controllers
                 {
                     _logger.LogWarning("User account locked out.");
                     return RedirectToAction(nameof(Lockout));
-                }
+                }*/
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
@@ -87,7 +91,7 @@ namespace RaupjcProject.Controllers
             return View(model);
         }
 
-        [HttpGet]
+        /*[HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> LoginWith2fa(bool rememberMe, string returnUrl = null)
         {
@@ -202,7 +206,7 @@ namespace RaupjcProject.Controllers
         public IActionResult Lockout()
         {
             return View();
-        }
+        }*/
 
         [HttpGet]
         [AllowAnonymous]
@@ -220,10 +224,18 @@ namespace RaupjcProject.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.Nick, Email = model.Email };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    var myUser = new User()
+                    {
+                        Id = user.Id,
+                        Nickname = user.UserName
+                    };
+
+                    await _jukeboxRepository.AddUserAsync(myUser);
+
                     _logger.LogInformation("User created a new account with password.");
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -232,7 +244,7 @@ namespace RaupjcProject.Controllers
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     _logger.LogInformation("User created a new account with password.");
-                    return RedirectToLocal(returnUrl);
+                    return RedirectToAction("Jukebox", "Jukebox", new { area = "" });
                 }
                 AddErrors(result);
             }
@@ -247,10 +259,10 @@ namespace RaupjcProject.Controllers
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
-            return RedirectToAction(nameof(HomeController.Index), "Home");
+            return RedirectToAction("Index", "Jukebox", new { area = "" });
         }
 
-        [HttpPost]
+        /*[HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public IActionResult ExternalLogin(string provider, string returnUrl = null)
@@ -310,10 +322,16 @@ namespace RaupjcProject.Controllers
                 {
                     throw new ApplicationException("Error loading external login information during confirmation.");
                 }
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.Nick, Email = model.Email };
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
+                    var myUser = new User()
+                    {
+                        Id = user.Id,
+                        Nick = user.UserName
+                    };
+
                     result = await _userManager.AddLoginAsync(user, info);
                     if (result.Succeeded)
                     {
@@ -327,7 +345,7 @@ namespace RaupjcProject.Controllers
 
             ViewData["ReturnUrl"] = returnUrl;
             return View(nameof(ExternalLogin), model);
-        }
+        }*/
 
         [HttpGet]
         [AllowAnonymous]
@@ -335,7 +353,7 @@ namespace RaupjcProject.Controllers
         {
             if (userId == null || code == null)
             {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
+                return RedirectToAction("Index", "Jukebox", new { area = "" });
             }
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
@@ -346,7 +364,7 @@ namespace RaupjcProject.Controllers
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
-        [HttpGet]
+        /*[HttpGet]
         [AllowAnonymous]
         public IActionResult ForgotPassword()
         {
@@ -385,7 +403,7 @@ namespace RaupjcProject.Controllers
         public IActionResult ForgotPasswordConfirmation()
         {
             return View();
-        }
+        }*/
 
         [HttpGet]
         [AllowAnonymous]
@@ -455,7 +473,7 @@ namespace RaupjcProject.Controllers
             }
             else
             {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
+                return RedirectToAction("Index", "Jukebox", new { area = "" });
             }
         }
 

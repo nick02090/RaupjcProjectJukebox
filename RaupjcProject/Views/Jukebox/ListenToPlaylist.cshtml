@@ -1,0 +1,75 @@
+﻿@model RaupjcProject.Models.JukeboxViewModels.ListenToPlaylistViewModel
+
+@{
+    ViewData["Title"] = "Listening to " + Model.Playlist.Name;
+}
+
+<style>
+    #playlist {
+        list-style: none;
+    }
+    #playlist li a{
+        color: black;
+        text-decoration: none;
+    }
+    #playlist .current-song a{
+        color:blue;
+    }
+    .center-block {
+        display: table;
+        margin-left: auto;
+        margin-right: auto;
+    }
+</style>
+
+<div class="center-block">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <p>
+                <span class="glyphicon glyphicon-book"></span> <strong>Name: </strong>@Model.Playlist.Name<br/>
+                <span class="glyphicon glyphicon-fire"></span> <strong>Moods: </strong>@foreach (var mood in Model.Playlist.Moods)
+                {
+                    @(mood.Value + " ");
+                }
+            </p>
+        </div>
+        <div class="panel-body">
+            @if (Model.Playlist.Image == null)
+             {
+                  <p>No image found.</p>
+             }
+             else
+             {
+                  <img src="data:image;base64,@Convert.ToBase64String(Model.Playlist.Image)" width="350" height="300" align="middle" />
+             }
+        </div>
+        <div class="panel-footer">
+            <audio src="" controls id="playlistPlayer"></audio><br/>
+            <br/><ul id="playlist">
+                @{var iterator = 1;}
+                @foreach (var song in Model.Playlist.Songs)
+                {
+                    <li><a id="data:audio/mpeg;base64,@Convert.ToBase64String(song.Sound)">@iterator. @song.Artist - @song.Title 
+                        (@if (song.Album != null) { @(song.Album)} @if (song.Year != null) { @(song.Year)})</a></li>
+                    iterator++;
+                }
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-2.2.0.js"></script>
+    <script>
+        playlistPlayer();
+        function playlistPlayer() {
+            var currentSong = 0;
+            $("#playlistPlayer")[0].src = $("#playlist li a")[0].id;
+            $("#playlistPlayer")[0].play();
+            $("#playlistPlayer")[0].addEventListener("ended", function () {
+                currentSong++;
+                if (currentSong == $("#playlist li a").length) currentSong = -1;
+                $("#playlistPlayer")[0].src = $("#playlist li a")[currentSong].id;
+                $("#playlistPlayer")[0].play();
+            });
+        }
+    </script>
+</div>

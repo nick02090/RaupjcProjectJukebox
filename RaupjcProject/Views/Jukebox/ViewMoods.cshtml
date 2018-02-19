@@ -1,0 +1,36 @@
+﻿@model RaupjcProject.Models.JukeboxViewModels.ViewMoodsViewModel
+@{
+    ViewData["Title"] = "View Moods";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div>
+    <h4>Table of all moods and number of their showing in playlists.</h4>
+    <hr />
+    <div>
+        <table class="table">
+            <tr>
+                <th>Mood</th>
+                <th>Frequnecy</th>
+            </tr>
+            @if (Model.Moods != null)
+            {
+                @if (Model.Moods.Count > 0)
+                {
+                    @for (var i=0;i<Model.Moods.Count;i++)
+                    {
+                        <tr>
+                            <th>@Model.Moods[i].Value</th>
+                            <th>@Model.Frequencies[i]</th>
+                        </tr>
+                     }
+                }
+            }
+        </table>
+    </div>
+    <hr />
+    <p>
+        <a asp-area="" asp-controller="Jukebox" asp-action="AddMoods">Add new moods?</a>
+    </p>
+</div>

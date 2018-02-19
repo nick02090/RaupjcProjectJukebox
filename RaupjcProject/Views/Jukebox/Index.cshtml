@@ -1,0 +1,71 @@
+﻿@{
+    Layout = null;
+}
+
+<link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+      asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+      asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+
+@{
+    ViewData["Title"] = "Jukebox";
+}
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet">
+    <style>
+        h1 {
+            font-family: 'Orbitron';
+            color: blueviolet;
+            text-shadow: 0 0 3px #FF0000, 0 0 5px #0000FF;
+            text-align: center;
+            font-size: 45px;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+        }
+
+        .bg {
+            background-color: aliceblue;
+            height: 100%;
+            position: relative;
+            opacity: 0.65;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .caption {
+            position: absolute;
+            left: 0;
+            top: 40%;
+            width: 100%;
+            text-align: center;
+        }
+
+        form {
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg">
+        <div class="caption">
+            <h1>Jukebox</h1><br />
+            <div class="btn-group">
+                <form asp-controller="Account" asp-action="Login" method="get">
+                    <button type="submit" class="btn btn-default">Log in</button>
+                </form>
+                <form asp-controller="Account" asp-action="Register" method="get">
+                    <button type="submit" class="btn btn-default">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

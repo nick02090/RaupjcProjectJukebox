@@ -1,0 +1,55 @@
+﻿@model RaupjcProject.Models.JukeboxViewModels.AddSongViewModel
+@{
+    ViewData["Title"] = "New song";
+}
+
+<!DOCTYPE html>
+
+<h2>@ViewData["Title"]</h2>
+
+<div>
+    <h4>Manage song settings</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+                <div>
+                    <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" enctype="multipart/form-data">
+                        <div class="input-group">
+                            <input asp-for="File" type="file" class="glyphicon glyphicon-search" />
+                            <span asp-validation-for="File" class="text-danger"></span>
+                        </div><br />
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                            <input asp-for="Artist" type="text" class="form-control" placeholder="Artist (e.g. Linkin Park)" />
+                            <span asp-validation-for="Artist" class="text-danger"></span>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-music"></i></span>
+                            <input asp-for="Title" type="text" class="form-control" placeholder="Title (e.g. In The End)" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-cd"></i></span>
+                            <input asp-for="Album" type="text" class="form-control" placeholder="Album (e.g. Hybrid Theory)" />
+                            <span asp-validation-for="Album" class="text-danger"></span>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                            <input asp-for="Year" type="text" class="form-control" placeholder="Year (e.g. 2000.)" />
+                            <span asp-validation-for="Year" class="text-danger"></span>
+                        </div><br />
+                        <button type="submit" class="btn btn-primary">Add song</button><br/>
+                        @if (Model.IsMp3 == false)
+                        {
+                          <br /><div class="alert alert-danger">
+                             <strong>Error!</strong> Only .mp3 files supported!
+                          </div>
+                        }
+                    </form>
+            </div>
+        </div>
+        <div class="col-md-6">
+
+        </div>
+    </div>
+</div>

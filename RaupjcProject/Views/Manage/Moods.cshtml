@@ -1,0 +1,45 @@
+﻿@model MoodsViewModel
+@{
+    ViewData["Title"] = "Moods";
+    ViewData.AddActivePage(ManageNavPages.Moods);
+}
+
+<h4>@ViewData["Title"]</h4>
+@Html.Partial("_StatusMessage", Model.StatusMessage)
+
+@if (Model.User.Nickname.Equals("admin123"))
+{
+    <div class="alert-warning">
+        <strong><span class="glyphicon glyphicon-warning-sign"></span></strong> You're signed in as admin - you have access to all of the moods.<br />
+    </div>
+
+    @if (Model.Moods.Count > 0)
+    {
+        <p>Number of moods: @Model.Moods.Count</p><br />
+        <p>
+            <a asp-area="" asp-controller="Jukebox" asp-action="ViewMoods">View all moods?</a>
+            <a asp-area="" asp-controller="Jukebox" asp-action="AddMoods">Add new moods?</a>
+        </p>
+    }
+    else
+    {
+        <p>There are no moods.</p><br />
+        <p>
+            <a asp-area="" asp-controller="Jukebox" asp-action="AddMoods">Add new moods?</a>
+        </p>
+    }
+
+
+}
+else
+{
+    <div class="alert-danger">
+        <strong><span class="glyphicon glyphicon-exclamation-sign"></span></strong> You're not signed in as admin. Only admin can access this section.<br />
+    </div>
+
+}
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
