@@ -24,7 +24,7 @@ Konačno, na naslovnoj stranici (klikom na Jukebox u gornjem lijevom kutu) koris
 može upisati nekoliko Mood-ova (razmaknutih razmakom) te će mu se izlistati sve playliste koje sadrže barem jedan od upisanih Mood-ova. 
 Svaka playlista je prikazana s imenom (Name), svojim odgovarajućim Mood-ovima (Moods), brojem Song-ova u sebi (Tracks), prikazom slike 
 (ukoliko postoji) te opcijom Listen koja pokreće odabranu playlistu u njenom vlastitom player-u. U player-u su prikazani isti atributi, 
-ali je uz njih još dodan popis svih pjesama redom ipisanih te numeriranih. Pjesme se pokreću automatski (na autoplay) te ih je moguće
+ali je uz njih još dodan popis svih pjesama redom ispisanih te numeriranih. Pjesme se pokreću automatski (na autoplay) te ih je moguće
 zaustaviti, ali njihov odabir nije moguć. Naime, kada završi prva pjesma s popisa, pokreće se druga, potom treća, itd. Nakon završetka svih
 pjesama player staje te se potrebno preusmjeriti nazad u Jukebox (ukoliko korisnik želi slušati playliste) ili u svoj profil ukoliko želi
 dodati nove.
