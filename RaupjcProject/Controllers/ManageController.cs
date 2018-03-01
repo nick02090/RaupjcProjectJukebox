@@ -53,6 +53,19 @@ namespace RaupjcProject.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
+            //check if user forcely quit editing the playlist and delete it
+            var appUser = await _userManager.GetUserAsync(User);
+            var myUser = await _jukeboxRepository.GetUserAsync(appUser.Id);
+            var myPlaylists = await _jukeboxRepository.GetAllFilteredPlaylistsAsync(p => p.User.Id.Equals(myUser.Id));
+            var playlist = myPlaylists.FirstOrDefault(p => !p.IsCreated);
+            if (playlist != null)
+            {
+                var playlistUser = playlist.User;
+                playlistUser.Playlists.Remove(playlist);
+                //sending playlistUser cause current user can be admin and other users can't even reach this method
+                await _jukeboxRepository.RemovePlaylistAsync(playlist.Id, playlistUser.Id);
+                await _jukeboxRepository.UpdateUserAsync(playlistUser, playlistUser.Id);
+            }
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {

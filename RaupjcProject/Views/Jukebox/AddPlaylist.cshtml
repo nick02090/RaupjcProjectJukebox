@@ -17,7 +17,7 @@
                 }
                 else
                 {
-                    @("N/A");
+                    @("0");
                 }):<br />
             </p>
             @if (Model.Playlist.Songs != null && Model.Playlist.Songs.Count > 0)
@@ -59,7 +59,7 @@
         </div>
         <div class="col-md-6">
             <div class="alert-warning">
-                 <strong><span class="glyphicon glyphicon-warning-sign"></span>Warning!</strong>Once added song can not be removed!<br />
+                 <strong><span class="glyphicon glyphicon-warning-sign"></span> Warning:</strong>Once added song can not be removed!<br />
             </div>
             <p>
                 Available songs from database (@if (Model.AllSongs != null)
@@ -95,7 +95,7 @@
                         <p>
                             Showing only first 20 results (if you didn't get the wanted result, try to be more specific!)<br />
                             <div class="alert-success">
-                                <strong>Success!</strong> Number of found songs by filter: {@Model.SearchedSongs.Count}<br />
+                                <strong><span class="glyphicon glyphicon-ok"></span> Success:</strong> Number of found songs by filter: {@Model.SearchedSongs.Count}<br />
                             </div>
                         </p>
                         <div class="list-group">
@@ -125,9 +125,18 @@
                                             <span class="badge">(@song.Year)</span>
                                         }
                                     </a>
-                                    @Html.ActionLink("Add to playlist", "AddSongToPlaylist", new { song.Id })
+                                    @if (Model.Playlist.Songs != null && Model.Playlist.Songs.Count < 20)
+                                    {
+                                        @Html.ActionLink("Add to playlist", "AddSongToPlaylist", new { song.Id})
+                                    }
                                 }
 
+                            }
+                            @if (Model.Playlist.Songs != null && Model.Playlist.Songs.Count >= 20)
+                            {
+                             <div class="alert alert-warning">
+                                 <strong><span class="glyphicon glyphicon-warning-sign"></span> Warning:</strong> Playlist can contain only twenty (20) songs!
+                             </div>
                             }
                         </div>
 
@@ -135,7 +144,7 @@
                     else
                     {
                         <div class="alert alert-danger">
-                            <strong>Error!</strong> There's no match for your filter entry, please try again!
+                            <strong><span class="glyphicon glyphicon-exclamation-sign"></span> Error:</strong> There's no match for your filter entry, please try again!
                         </div>
                     }
                 }
@@ -145,11 +154,31 @@
     </div>
     <hr />
     <div class="row">
-        <div class="col-md-offset-11">
-            <form asp-area="" asp-controller="Jukebox" asp-action="AddPlaylistMoods">
-                <button type="submit" class="btn btn-warning">Next</button>
-            </form>
-        </div>
+            <div class="col-md-6">
+                <br/>@Html.ActionLink("Discard", "DeletePlaylist", "Jukebox", new { Model.Playlist.Id})<br/>
+                <div class="alert alert-warning">
+                    <strong><span class="glyphicon glyphicon-warning-sign"></span> Warning:</strong> Discarding will delete the playlist and all it's contents!
+                </div>
+            </div>
+            
+            @if (Model.Playlist.Songs != null && Model.Playlist.Songs.Count >= 3)
+            {
+            <div class="col-md-offset-11">
+                <form asp-area="" asp-controller="Jukebox" asp-action="AddPlaylistMoods">
+                    <button type="submit" class="btn btn-warning">Next</button>
+                </form>
+            </div>
+            }else
+            {
+            <div class="col-md-offset-11">
+                <button disabled class="btn btn-warning">Next</button>
+            </div>
+            <div class="col-md-offset-6">
+                <div class="alert alert-warning">
+                    <strong><span class="glyphicon glyphicon-warning-sign"></span> Warning:</strong> Playlist has to contain at least three (3) songs.
+                </div>
+            </div>
+            }
     </div>
 </div>
 

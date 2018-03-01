@@ -21,8 +21,9 @@
                             <span class="input-group-addon"><i class="glyphicon glyphicon-book"></i></span>
                             <input asp-for="Name" type="text" class="form-control" placeholder="Playlist name (e.g. My Christmas Mix)" />
                             <span asp-validation-for="Name" class="text-danger"></span>
-                        </div><br/>
+                        </div><br />
                         <button type="submit" class="btn btn-primary">Add playlist</button><br />
+                        <br/>@Html.ActionLink("Discard", "MyPlaylists", "Manage")<br/>
                     </form>
             </div>
 
@@ -31,7 +32,16 @@
                 @if (Model.IsPicture == false)
                 {
                     <br /><div class="alert alert-danger">
-                         <strong>Error!</strong> Picture must be type of .jpg, .jpeg or .png!
+                         <strong><span class="glyphicon glyphicon-exclamation-sign"></span> Error:</strong> Picture must be type of .jpg!
+                     </div>
+                }
+            }
+            @if(Model.Attempt == true)
+            {
+                @if (Model.PlaylistExists == true)
+                {
+                    <br /><div class="alert alert-danger">
+                         <strong><span class="glyphicon glyphicon-exclamation-sign"></span> Error:</strong> Playlist with the same name (@Model.Name) already exists!
                      </div>
                 }
             }

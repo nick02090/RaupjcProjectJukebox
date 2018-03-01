@@ -257,6 +257,19 @@ namespace RaupjcProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
+            //check if user forcely quit editing the playlist and delete it
+            var appUser = await _userManager.GetUserAsync(User);
+            var user = await _jukeboxRepository.GetUserAsync(appUser.Id);
+            var myPlaylists = await _jukeboxRepository.GetAllFilteredPlaylistsAsync(p => p.User.Id.Equals(user.Id));
+            var playlist = myPlaylists.FirstOrDefault(p => !p.IsCreated);
+            if (playlist != null)
+            {
+                var playlistUser = playlist.User;
+                playlistUser.Playlists.Remove(playlist);
+                //sending playlistUser cause current user can be admin and other users can't even reach this method
+                await _jukeboxRepository.RemovePlaylistAsync(playlist.Id, playlistUser.Id);
+                await _jukeboxRepository.UpdateUserAsync(playlistUser, playlistUser.Id);
+            }
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
             return RedirectToAction("Index", "Jukebox", new { area = "" });

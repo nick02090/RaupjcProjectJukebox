@@ -66,6 +66,19 @@ namespace RaupjcProject.Controllers
         [HttpGet]
         public async Task<IActionResult> Jukebox()
         {
+            //check if user forcely quit editing the playlist and delete it
+            var appUser = await _userManager.GetUserAsync(User);
+            var user = await _jukeboxRepository.GetUserAsync(appUser.Id);
+            var myPlaylists = await _jukeboxRepository.GetAllFilteredPlaylistsAsync(p => p.User.Id.Equals(user.Id));
+            var playlist = myPlaylists.FirstOrDefault(p => !p.IsCreated);
+            if (playlist != null)
+            {
+                var playlistUser = playlist.User;
+                playlistUser.Playlists.Remove(playlist);
+                //sending playlistUser cause current user can be admin and other users can't even reach this method
+                await _jukeboxRepository.RemovePlaylistAsync(playlist.Id, playlistUser.Id);
+                await _jukeboxRepository.UpdateUserAsync(playlistUser, playlistUser.Id);
+            }
             var allPlaylists = await _jukeboxRepository.GetAllPlaylistsAsync();
             var model = new JukeboxViewModel(allPlaylists);
             return View(model);
@@ -112,8 +125,21 @@ namespace RaupjcProject.Controllers
         }
 
         [HttpGet]
-        public IActionResult Info()
+        public async Task<IActionResult> Info()
         {
+            //check if user forcely quit editing the playlist and delete it
+            var appUser = await _userManager.GetUserAsync(User);
+            var user = await _jukeboxRepository.GetUserAsync(appUser.Id);
+            var myPlaylists = await _jukeboxRepository.GetAllFilteredPlaylistsAsync(p => p.User.Id.Equals(user.Id));
+            var playlist = myPlaylists.FirstOrDefault(p => !p.IsCreated);
+            if (playlist != null)
+            {
+                var playlistUser = playlist.User;
+                playlistUser.Playlists.Remove(playlist);
+                //sending playlistUser cause current user can be admin and other users can't even reach this method
+                await _jukeboxRepository.RemovePlaylistAsync(playlist.Id, playlistUser.Id);
+                await _jukeboxRepository.UpdateUserAsync(playlistUser, playlistUser.Id);
+            }
             return View();
         }
 
@@ -130,10 +156,17 @@ namespace RaupjcProject.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View();
+                return View(model);
             }
             var appUser = await _userManager.GetUserAsync(User);
             var user = await _jukeboxRepository.GetUserAsync(appUser.Id);
+            var myPlaylists = await _jukeboxRepository.GetAllFilteredPlaylistsAsync(playlist => playlist.User.Id.Equals(user.Id));
+            if (myPlaylists.Any(playlist => playlist.Name.Equals(model.Name)))
+            {
+                model.Attempt = true;
+                model.PlaylistExists = true;
+                return View(model);
+            }
             if (model.PictureFile != null)
             {
                 if (!model.PictureFile.FileName.EndsWith(".jpg"))
@@ -198,98 +231,28 @@ namespace RaupjcProject.Controllers
             var myPlaylists = await _jukeboxRepository.GetAllFilteredPlaylistsAsync(p => p.User.Id.Equals(user.Id));
             var playlist = myPlaylists.FirstOrDefault(p => !p.IsCreated);
             var newModel = new AddPlaylistViewModel(playlist, songs, user);
-            if (model.Artist != null || model.Album != null || model.Year != null || model.Title != null)
+            if (model.Artist != null || model.Title != null)
             {
                 List<Song> searchedSongs;
                 //ugliest else-if ever...
-                //checking which strings are (not) null so it only goes to database once and does all the filtering 
-                //in GUI deleted filtering for Year and Album whilst not all Songs contain does properties, so i complicates things + no time to finish :(
-                if (model.Artist != null && model.Album == null && model.Year == null && model.Title == null)
+                //checking which strings are (not) null so it only filters once 
+                if (model.Artist != null && model.Title != null)
                 {
-                    searchedSongs = await _jukeboxRepository.GetAllFilteredSongsAsync(song => song.Artist.ToLower().Contains(model.Artist.ToLower()));
-                }
-                else if (model.Album != null && model.Artist == null && model.Year == null && model.Title == null)
+                    searchedSongs = songs.Where(song => song.Artist.ToLower().Contains(model.Artist.ToLower()) ||
+                        song.Title.ToLower().Contains(model.Title.ToLower())).ToList();
+                } else if (model.Artist != null && model.Title == null)
                 {
-                    searchedSongs = await _jukeboxRepository.GetAllFilteredSongsAsync(song => song.Album.ToLower().Contains(model.Album.ToLower()));
-                }
-                else if (model.Year != null && model.Album == null && model.Artist == null && model.Title == null)
+                    searchedSongs = songs.Where(song => song.Artist.ToLower().Contains(model.Artist.ToLower())).ToList();
+                } else if (model.Artist == null && model.Title != null)
                 {
-                    searchedSongs = await _jukeboxRepository.GetAllFilteredSongsAsync(song => song.Year.Equals(model.Year));
-                }
-                else if (model.Artist != null && model.Album != null && model.Year == null && model.Title == null)
-                {
-                    searchedSongs = await _jukeboxRepository.GetAllFilteredSongsAsync(song => song.Artist.ToLower().Contains(model.Artist.ToLower()) &&
-                        song.Album.ToLower().Contains(model.Album.ToLower()));
-                }
-                else if (model.Artist != null && model.Year != null && model.Album == null && model.Title == null)
-                {
-                    searchedSongs = await _jukeboxRepository.GetAllFilteredSongsAsync(song => song.Artist.ToLower().Contains(model.Artist.ToLower()) &&
-                        song.Year.Equals(model.Year));
-                }
-                else if (model.Album != null && model.Year != null && model.Artist == null && model.Title == null)
-                {
-                    searchedSongs = await _jukeboxRepository.GetAllFilteredSongsAsync(song => song.Album.ToLower().Contains(model.Album.ToLower()) &&
-                        song.Year.Equals(model.Year));
-                }
-                else if (model.Album != null && model.Year != null && model.Artist != null && model.Title == null)
-                {
-                    searchedSongs = await _jukeboxRepository.GetAllFilteredSongsAsync(song => song.Album.ToLower().Contains(model.Album.ToLower()) &&
-                        song.Year.Equals(model.Year) &&
-                        song.Artist.ToLower().Contains(model.Artist.ToLower()));
-                }
-                else if (model.Artist != null && model.Album == null && model.Year == null && model.Title != null)
-                {
-                    searchedSongs = await _jukeboxRepository.GetAllFilteredSongsAsync(song => song.Artist.ToLower().Contains(model.Artist.ToLower()) &&
-                        song.Title.ToLower().Contains(model.Title.ToLower()));
-                }
-                else if (model.Album != null && model.Artist == null && model.Year == null && model.Title != null)
-                {
-                    searchedSongs = await _jukeboxRepository.GetAllFilteredSongsAsync(song => song.Album.ToLower().Contains(model.Album.ToLower()) &&
-                        song.Title.ToLower().Contains(model.Title.ToLower()));
-                }
-                else if (model.Year != null && model.Album == null && model.Artist == null && model.Title != null)
-                {
-                    searchedSongs = await _jukeboxRepository.GetAllFilteredSongsAsync(song => song.Year.Equals(model.Year) &&
-                        song.Title.ToLower().Contains(model.Title.ToLower()));
-                }
-                else if (model.Artist != null && model.Album != null && model.Year == null && model.Title != null)
-                {
-                    searchedSongs = await _jukeboxRepository.GetAllFilteredSongsAsync(song => song.Artist.ToLower().Contains(model.Artist.ToLower()) &&
-                        song.Album.ToLower().Contains(model.Album.ToLower()) &&
-                        song.Title.ToLower().Contains(model.Title.ToLower()));
-                }
-                else if (model.Artist != null && model.Year != null && model.Album == null && model.Title != null)
-                {
-                    searchedSongs = await _jukeboxRepository.GetAllFilteredSongsAsync(song => song.Artist.ToLower().Contains(model.Artist.ToLower()) &&
-                        song.Year.Equals(model.Year) &&
-                        song.Title.ToLower().Contains(model.Title.ToLower()));
-                }
-                else if (model.Album != null && model.Year != null && model.Artist == null && model.Title != null)
-                {
-                    searchedSongs = await _jukeboxRepository.GetAllFilteredSongsAsync(song => song.Album.ToLower().Contains(model.Album.ToLower()) &&
-                        song.Year.Equals(model.Year) &&
-                        song.Title.ToLower().Contains(model.Title.ToLower()));
-                }
-                else if (model.Album != null && model.Year != null && model.Artist != null && model.Title != null)
-                {
-                    searchedSongs = await _jukeboxRepository.GetAllFilteredSongsAsync(song => song.Album.ToLower().Contains(model.Album.ToLower()) &&
-                        song.Year.Equals(model.Year) &&
-                        song.Artist.ToLower().Contains(model.Artist.ToLower()) &&
-                        song.Title.ToLower().Contains(model.Title.ToLower()));
-                }
-                else if (model.Album == null && model.Year == null && model.Artist == null && model.Title != null)
-                {
-                    searchedSongs = await _jukeboxRepository.GetAllFilteredSongsAsync(song => song.Title.ToLower().Contains(model.Title.ToLower()));
-                }else
+                    searchedSongs = songs.Where(song => song.Title.ToLower().Contains(model.Title.ToLower())).ToList();
+                } else
                 {
                     searchedSongs = null;
                 }
                 newModel.SearchedSongs = searchedSongs;
                 newModel.Artist = model.Artist;
-                newModel.Album = model.Album;
-                newModel.Year = model.Year;
                 newModel.Title = model.Title;
-                return View(newModel);
             }
             return View(newModel);
         }
@@ -412,6 +375,7 @@ namespace RaupjcProject.Controllers
             var user = await _jukeboxRepository.GetUserAsync(appUser.Id);
             var moods = await _jukeboxRepository.GetAllMoodsAsync();
             var myPlaylists = await _jukeboxRepository.GetAllFilteredPlaylistsAsync(p => p.User.Id.Equals(user.Id));
+            var sortedMoods = moods.OrderBy(mood => mood.Playlists.Count).ToList();
             Playlist playlist;
             if (name == null)
             {
@@ -421,7 +385,7 @@ namespace RaupjcProject.Controllers
             {
                 playlist = myPlaylists.FirstOrDefault(p => p.Name.Equals(name));
             }
-            var model = new AddPlaylistMoodsViewModel(playlist, moods);
+            var model = new AddPlaylistMoodsViewModel(playlist, sortedMoods);
             return View(model);
         }
 
@@ -436,9 +400,10 @@ namespace RaupjcProject.Controllers
             var appUser = await _userManager.GetUserAsync(User);
             var user = await _jukeboxRepository.GetUserAsync(appUser.Id);
             var moods = await _jukeboxRepository.GetAllMoodsAsync();
+            var sortedMoods = moods.OrderBy(mood => mood.Playlists.Count).ToList();
             var myPlaylists = await _jukeboxRepository.GetAllFilteredPlaylistsAsync(p => p.User.Id.Equals(user.Id));
             var playlist = myPlaylists.FirstOrDefault(p => !p.IsCreated);
-            var newModel = new AddPlaylistMoodsViewModel(playlist, moods);
+            var newModel = new AddPlaylistMoodsViewModel(playlist, sortedMoods);
             if (model.Search != null)
             {
                 newModel.SearchedMoods = moods.Where(mood => mood.Value.ToLower().Contains(model.Search.ToLower())).ToList();

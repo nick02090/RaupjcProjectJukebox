@@ -13,8 +13,6 @@ namespace RaupjcProject.Models.JukeboxViewModels
         public Playlist Playlist { get; set; }
         public User User { get; set; }
         public string Artist { get; set; }
-        public string Album { get; set; }
-        public string Year { get; set; }
         public string Title { get; set; }
         public string Name { get; set; }
         public List<Song> SearchedSongs { get; set; }
@@ -23,8 +21,6 @@ namespace RaupjcProject.Models.JukeboxViewModels
         {
             SearchedSongs = null;
             Artist = null;
-            Album = null;
-            Year = null;
             Title = null;
         }
 
@@ -32,8 +28,6 @@ namespace RaupjcProject.Models.JukeboxViewModels
         {
             SearchedSongs = null;
             Artist = null;
-            Album = null;
-            Year = null;
             Title = null;
             Playlist = playlist;
         }
@@ -44,8 +38,6 @@ namespace RaupjcProject.Models.JukeboxViewModels
             User = user;
             SearchedSongs = null;
             Artist = null;
-            Album = null;
-            Year = null;
             Title = null;
             Playlist = playlist;
         }

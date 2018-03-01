@@ -39,6 +39,7 @@
                             <span asp-validation-for="Year" class="text-danger"></span>
                         </div><br />
                         <button type="submit" class="btn btn-primary">Add song</button><br/>
+                        <br/>@Html.ActionLink("Back", "AddPlaylist", "Jukebox")<br/>
                         @if (Model.IsMp3 == false)
                         {
                           <br /><div class="alert alert-danger">

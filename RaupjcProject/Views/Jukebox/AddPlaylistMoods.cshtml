@@ -26,18 +26,19 @@
         </div>
         <div class="col-md-6">
             <div class="alert-warning">
-                 <strong><span class="glyphicon glyphicon-warning-sign"></span>Warning!</strong>Once added mood can not be removed!<br />
+                 <strong><span class="glyphicon glyphicon-warning-sign"></span> Warning:</strong>Once added mood can not be removed!<br />
             </div>
             @if (Model.AllMoods != null)
             {
                 @if (Model.AllMoods.Count > 0)
                 {
-                    <p>Top 20 moods:</p><br />
+                    <p>Top 20 moods (frequnecy in brackets):</p><br />
                     <div class="btn-group">
                         @foreach (var mood in Model.AllMoods.Take(20).ToList())
                         {
                             
                         <p>
+                            @("(" + mood.Playlists.Count + ") ")
                             <button type="button" class="btn btn-primary" disabled>@mood.Value</button>
                             @Html.ActionLink("Add to playlist", "AddMoodToPlaylist", new { mood.Value })<br />
                         </p>
@@ -68,14 +69,17 @@
                     <p>
                         Showing only first 20 results (if you didn't get the wanted result, try to be more specific!)<br />
                         <div class="alert-success">
-                            <strong>Success!</strong> Number of found moods by filter: {@Model.SearchedMoods.Count}<br />
+                            <strong><span class="glyphicon glyphicon-ok"></span> Success:</strong> Number of found moods by filter: {@Model.SearchedMoods.Count}<br />
                         </div>
                     </p>
                     <div class="btn-group">
                         @foreach (var mood in Model.SearchedMoods.Take(20).ToList())
                         {
+                        <p>
+                            @("(" + mood.Playlists.Count + ") ")
                             <button type="button" class="btn btn-primary" disabled>@mood.Value</button>
-                            @Html.ActionLink("Add to playlist", "AddMoodToPlaylist", new { mood.Value })
+                            @Html.ActionLink("Add to playlist", "AddMoodToPlaylist", new { mood.Value })<br />
+                        </p>
                         }
                     </div>
                 }
@@ -84,7 +88,7 @@
                     @if (Model.Search != null)
                     {
                         <div class="alert alert-danger">
-                            <strong>Error!</strong> There's no match for your mood entry (@Model.Search), please try again!
+                            <strong><span class="glyphicon glyphicon-exclamation-sign"></span> Error:</strong> There's no match for your mood entry (@Model.Search), please try again!
                         </div>
                     }
                 }
@@ -94,10 +98,30 @@
     </div>
     <hr />
     <div class="row">
-        <div class="col-md-offset-11">
+            <div class="col-md-6">
+                <br/>@Html.ActionLink("Discard", "DeletePlaylist", "Jukebox", new { Model.Playlist.Id})<br/>
+                <div class="alert alert-warning">
+                    <strong><span class="glyphicon glyphicon-warning-sign"></span> Warning:</strong> Discarding will delete the playlist and all it's contents!
+                </div>
+            </div>
+
+            @if (Model.Playlist.Moods != null && Model.Playlist.Moods.Count >= 1)
+            {
+            <div class="col-md-offset-11">
             <form asp-area="" asp-controller="Jukebox" asp-action="CreatePlaylist">
                 <button type="submit" class="btn btn-warning">Create</button>
             </form>
-        </div>
+            </div>
+            } else
+            {
+                <div class="col-md-offset-11">
+                <button class="btn btn-warning" disabled>Create</button>
+                </div>
+                <div class="col-md-offset-6">
+                <div class="alert alert-warning">
+                      <strong><span class="glyphicon glyphicon-warning-sign"></span> Warning:</strong> Playlist has to contain at least one (1) mood!
+                </div>
+                </div>
+            }
     </div>
 </div>
